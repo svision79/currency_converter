@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Currency Converter</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f4f4;
+}
+
+.error{
+      color: red;
+    font-size: 14px;
+    text-align: left;
+}
+
+.converter-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+.input-group{
+    margin-bottom: 10px;
+}
+.input-number {
+  width: 90%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  /margin-bottom: 10px;/
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #55C074;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #44b752;
+}
+.output{
+    display: none;
+    align-items: center;
+    align-items: center;
+    justify-content: center;
+    background-color: #F5F5F5;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    color: #55C074;
+}
+
+#result {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+  </style>
+</head>
+<body>
+  <div class="converter-container">
+    <h2>Currency Converter</h2>
+    <div>
+      <div class="input-group">
+      <input type="number" id="sourceAmount" class='input-number' placeholder="Enter amount">
+            <div class="error" id="amountError"></div>
+    </div>
+    <div class="input-group">
+      <select id="sourceCurrency">
+        <option value="INR">INR(Indian Rupee)</option>
+        <option value="USD">USD(US Dollars)</option>
+        <option value="EUR">EUR(Euro)</option>
+        <option value="JPY">JPY(Japanese Yen)</option>
+        <!-- Add more currencies as needed -->
+      </select>
+    </div>
+    <div class="input-group">
+      <select id="targetCurrency">
+        <option value="USD">USD(US Dollars)</option>
+        <option value="EUR">EUR(Euro)</option>
+        <option value="JPY">JPY(Japanese Yen)</option>
+        <option value="INR">INR(Indian Rupee)</option>
+        <!-- Add more currencies as needed -->
+      </select>
+    </div>
+    <div class="output" id="outPut">
+      <p id="inner"></p>
+    </div>
+
+    <button onclick="convertCurrency()">Convert</button>
+    <div id="result"></div>
+  </div>
+  <script>
+
+      function myStopFunction() {
+        document.getElementById("amountError").style.display = 'none'
+      }
+        function convertCurrency() {
+            // Reset errors
+            document.getElementById("amountError").innerHTML = "";
+
+            // Get values from the form
+            const sourceCurrency = document.getElementById("sourceCurrency").value;
+            const targetCurrency = document.getElementById("targetCurrency").value;
+            const sourceAmount = document.getElementById("sourceAmount").value;
+            // Validate input
+            if (!/^\d+$/.test(sourceAmount) || sourceAmount.length >= 9) {
+                // setTimeout
+                document.getElementById("sourceAmount").value = ''
+                document.getElementById("amountError").innerHTML = "Invalid Input";
+                const myTimeout = setTimeout(myStopFunction, 2000);
+                return;
+            }
+
+            // API Endpoint (Replace with your IP if runnin on different machine)
+            const apiUrl = "http://localhost:8080/api/v1/currency/convert";
+
+            // API Request
+            fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    sourceCurrency,
+                    targetCurrency,
+                    sourceAmount
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the API response data here
+                const output = document.getElementById('outPut');
+                const inner = document.getElementById('inner');
+                // console.log(output,'output')
+                inner.innerHTML = targetCurrency + " = " +data.targetAmount;
+                output.style.display = 'flex';
+                console.log(data);
+            })
+            .catch(error => {
+                // Handle errors
+                console.error("Error:", error);
+            });
+        }
+    </script>
+</body>
+</html>
